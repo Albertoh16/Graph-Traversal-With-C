@@ -1,19 +1,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "bst.h"
+#include "utils.h"
 
-/*  This is a node struct for a binary search tree.
-    *left: Stores a node struct with a lesser value than itself.
-    *right: Stores a node struct with a greater value than itself.
-    value: Stores the current value of the node (0-255). */
-typedef struct BSTNode
-{
-    struct BSTNode *left;
-    struct BSTNode *right;
-    unsigned char value;
-} BSTNode;
-
-static BSTNode * CreateBSTNode(unsigned char val)
+BSTNode * CreateBSTNode(unsigned char val)
 {
     BSTNode *newNode = (BSTNode *)malloc(sizeof(BSTNode));
     newNode->left = NULL;
@@ -23,36 +14,51 @@ static BSTNode * CreateBSTNode(unsigned char val)
     return newNode;
 }
 
-void AddBSTNode(BSTNode *node, unsigned char newValue)
+BSTNode * AddBSTNode(BSTNode *node, unsigned char newValue)
 {
     if(node == NULL)
     {
-        node = CreateBSTNode(newValue);
-        return;
+        return CreateBSTNode(newValue);
+    }
+    
+    if(node->value > newValue) 
+    { 
+        node->left = AddBSTNode(node->left, newValue); 
+    }
+    
+    else 
+    { 
+        node->right = AddBSTNode(node->right, newValue); 
     }
 
-    if(node->value > newValue) { AddBSTNode(node->left, newValue); printf("Going Left\n"); }
-    else { AddBSTNode(node->right, newValue); printf("Going Right\n"); }
+    return node;
 }
 
 char * FindBSTNode(BSTNode *node, unsigned char target)
 {
-    static char buffer[50] = "";
+    static char buffer[90] = "";
 
     if (node == NULL) 
     { 
-        sprintf(buffer, "Target (%d) Not Found...", target);
+        sprintf(buffer, "Target (%d) Not Found... Total time used for search: %.5f Seconds.\n", target, GetTotalTimePassed());
         return buffer; 
     }
 
     else if(node->value == target) 
     { 
-        sprintf(buffer, "Target (%d) Found!!!", target);
+        sprintf(buffer, "Target (%d) Found!!! Total time used for search: %.5f Seconds.\n", target, GetTotalTimePassed());
         return buffer; 
     }
 
-    else if(node->value > target) { return FindBSTNode(node->left, target); }
-    else { return FindBSTNode(node->right, target);; }
+    else if(node->value > target) 
+    {   
+        return FindBSTNode(node->left, target); 
+    }
+    
+    else 
+    { 
+        return FindBSTNode(node->right, target); 
+    }
 }
 
 void TraverseBST(BSTNode *node)
